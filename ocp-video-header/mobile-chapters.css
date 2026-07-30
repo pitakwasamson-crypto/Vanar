@@ -1,0 +1,421 @@
+/* ==========================================================================
+   Vanar OCP — mobile image header (phone counterpart to the desktop scroller)
+
+   Adapted from the standalone bundle. Two deliberate departures from it:
+
+   1. Every global rule the bundle carried (`*`, `html`, `body`, `button, a`)
+      is GONE. The bundle was a whole page and repainted the document dark
+      green with its own type stack; dropped in here that would recolour the
+      entire site. Only `.mc-*` selectors survive.
+   2. Everything is wrapped in `@media (max-width: 720px)` — the site's own
+      breakpoint, the same one that hides `#ocp-video-header`. Above it the
+      markup is `display: none` AND unstyled, so the desktop path cannot be
+      reached even by accident.
+
+   Behaviour lives in ./mobile-chapters.js. Fonts (Big Shoulders Display,
+   JetBrains Mono, Inter Tight) are already loaded by the site layout.
+   ========================================================================== */
+
+.mc-mobile-entry {
+    display: none;
+}
+
+@media (max-width: 720px) {
+    .mc-mobile-entry {
+        --mc-nav-height: calc(60px + env(safe-area-inset-top));
+        --mc-ink: #f5fff9;
+        /* One accent for every slide: the mint-to-violet gradient the closing CTA
+       card runs on "hire it." (--glow-grad-on under .card-dark in styles.css).
+       The per-chapter accents survive only on the keyframe rail. */
+        --mc-accent-grad: linear-gradient(92deg, #7ce7b0 0%, #b6a8f2 100%);
+        --mc-display: "Big Shoulders Display", Impact, sans-serif;
+        --mc-body: "Inter Tight", Inter, system-ui, sans-serif;
+        --mc-mono: "JetBrains Mono", ui-monospace, monospace;
+        display: block;
+    }
+    .mc-header,
+    .mc-carousel-shell,
+    .mc-track,
+    .mc-slide {
+        width: 100%;
+        height: 100svh;
+        min-height: 620px;
+    }
+    .mc-header {
+        position: relative;
+        overflow: hidden;
+        background: #061b16;
+        color: var(--mc-ink);
+        font-family: var(--mc-body);
+    }
+    .mc-carousel-shell {
+        position: relative;
+    }
+    .mc-track {
+        display: flex;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-behavior: smooth;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none;
+        touch-action: pan-x pan-y;
+        overscroll-behavior-x: contain;
+    }
+    .mc-track::-webkit-scrollbar,
+    .mc-keyframes::-webkit-scrollbar {
+        display: none;
+    }
+    .mc-track:focus-visible {
+        outline: 2px solid #84f7c7;
+        outline-offset: -2px;
+    }
+    /* Pre-JS / no-JS fallback seeded into the track. The script calls
+     replaceChildren() on mount, so this only ever renders before the carousel
+     builds — but it is what a crawler with JS disabled indexes, so it stays
+     real, readable content rather than a spinner. */
+    .mc-seo {
+        flex: 0 0 100%;
+        overflow-y: auto;
+        margin: 0;
+        padding: calc(var(--mc-nav-height) + 24px) 20px 40px;
+        color: rgba(255, 255, 255, 0.82);
+    }
+    .mc-seo h1,
+    .mc-seo h2 {
+        margin: 0 0 6px;
+        color: #fff;
+        font: 900 30px/0.94 var(--mc-display);
+        letter-spacing: -0.03em;
+        text-transform: uppercase;
+    }
+    .mc-seo h2 {
+        margin-top: 22px;
+        font-size: 23px;
+    }
+    .mc-seo p {
+        margin: 0;
+        font-size: 14px;
+        line-height: 1.45;
+    }
+    .mc-slide {
+        --chapter-accent: #84f7c7;
+        position: relative;
+        flex: 0 0 100%;
+        min-width: 0;
+        overflow: hidden;
+        scroll-snap-align: start;
+        scroll-snap-stop: always;
+        background: #071f18;
+        isolation: isolate;
+    }
+    .mc-hero-image,
+    .mc-image-shade {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+    }
+    .mc-hero-image {
+        z-index: 0;
+        display: block;
+        object-fit: cover;
+        object-position: center;
+        transform: scale(1.002);
+    }
+    .mc-image-shade {
+        z-index: 1;
+        pointer-events: none;
+        background: linear-gradient(180deg, rgba(2, 13, 10, 0.42) 0%, transparent 26%), linear-gradient(180deg, transparent 34%, rgba(2, 13, 10, 0.16) 52%, rgba(2, 13, 10, 0.93) 89%, #020d0a 100%);
+    }
+    .mc-media-number {
+        position: absolute;
+        z-index: 5;
+        top: calc(var(--mc-nav-height) + 14px);
+        left: 18px;
+        padding: 7px 9px;
+        border: 1px solid rgba(255, 255, 255, 0.24);
+        border-radius: 999px;
+        background: rgba(4, 24, 18, 0.52);
+        color: rgba(255, 255, 255, 0.94);
+        font: 500 7px/1 var(--mc-mono);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        backdrop-filter: blur(9px);
+    }
+    .mc-copy {
+        position: absolute;
+        z-index: 4;
+        right: 20px;
+        bottom: calc(130px + env(safe-area-inset-bottom));
+        left: 20px;
+    }
+    .mc-copy h1,
+    .mc-copy h2 {
+        max-width: 16ch;
+        margin: 0;
+        color: #fff;
+        font: 900 clamp(40px, 11.5vw, 60px)/0.86 var(--mc-display);
+        /* -0.045em rather than the -0.035em the bundle shipped: at 390px the two
+       longest slide-03 lines came to 336px and 338px inside a 335px box, so
+       they each broke one word early and split the accent phrase across the
+       wrap. The extra tracking buys ~8px and costs nothing visually at this
+       size. Genuinely long lines (slides 01/02) still wrap, as they should. */
+        letter-spacing: -0.045em;
+        text-transform: uppercase;
+        text-shadow: 0 2px 28px rgba(0, 0, 0, 0.35);
+    }
+    /* Each heading is two stacked lines, both white; only the run of words
+     tagged as the accent phrase turns green. */
+    .mc-copy h1 .mc-line,
+    .mc-copy h2 .mc-line {
+        display: block;
+    }
+    /* Gradient clipped to the glyphs, same technique the CTA cards use. Two
+     things this needs that flat colour did not: `text-shadow` has to go,
+     because a transparent fill lets the shadow smear through the letters —
+     `drop-shadow` paints the clipped result instead and keeps the copy legible
+     over the photograph. And `box-decoration-break: clone` restarts the ramp on
+     each line box, so an accent phrase that wraps does not render its second
+     line as the tail end of one long gradient. */
+    .mc-copy h1 .mc-hl,
+    .mc-copy h2 .mc-hl {
+        background: var(--mc-accent-grad);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: transparent;
+        text-shadow: none;
+        filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.45));
+        -webkit-box-decoration-break: clone;
+        box-decoration-break: clone;
+    }
+    /* h1 is slide 00 and only slide 00 — it carries the site's lead statement and
+     runs biggest. The ceiling is set by "ORGANIZATION.", the longest unbreakable
+     line: past ~15.5vw it no longer fits the 335px measure at 390px wide and
+     wraps mid-word. */
+    .mc-copy h1 {
+        font-size: clamp(52px, 15.5vw, 84px);
+    }
+    /* Slide 0 only — the desktop header's `detailLead`, carried over so both
+     headers open on the same line. */
+    .mc-lead {
+        max-width: 36rem;
+        margin: 11px 0 0;
+        color: #fff;
+        font-size: clamp(15px, 4.3vw, 19px);
+        font-weight: 600;
+        line-height: 1.3;
+        text-shadow: 0 1px 14px rgba(0, 0, 0, 0.65);
+    }
+    .mc-lead+.mc-detail {
+        margin-top: 6px;
+    }
+    .mc-detail {
+        max-width: 36rem;
+        margin: 11px 0 0;
+        color: rgba(255, 255, 255, 0.78);
+        font-size: clamp(12px, 3.4vw, 15px);
+        line-height: 1.42;
+        text-shadow: 0 1px 14px rgba(0, 0, 0, 0.65);
+    }
+    /* Seven horizontal wordmarks, same files the desktop header uses. A 4-column
+     grid rather than flex-wrap so the split is always 4 + 3 — wrapping left it
+     at the mercy of each wordmark's intrinsic width. These marks are drawn
+     light for dark backgrounds, hence the dark chip (the square SVGs this
+     replaced were dark marks on a white plate). */
+    .mc-platforms {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 5px;
+        margin: 10px 0 0;
+        max-width: 300px;
+    }
+    .mc-platforms img {
+        width: 100%;
+        height: 25px;
+        padding: 5px 6px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 6px;
+        background: rgba(5, 36, 27, 0.52);
+        object-fit: contain;
+        backdrop-filter: blur(10px);
+    }
+    .mc-arrow {
+        position: absolute;
+        z-index: 12;
+        /* 32%, not the bundle's 43%: the copy block is bottom-anchored and grows
+       upward, and slide 00's enlarged heading reaches into the 43% band. This
+       clears the tallest slide at 568px through 844px while still sitting
+       below the fixed nav. */
+        top: 32%;
+        display: grid;
+        width: 38px;
+        height: 38px;
+        place-items: center;
+        border: 1px solid rgba(255, 255, 255, 0.28);
+        border-radius: 50%;
+        background: rgba(4, 24, 18, 0.56);
+        color: #fff;
+        font: inherit;
+        cursor: pointer;
+        backdrop-filter: blur(8px);
+        transition: opacity 150ms ease, transform 150ms ease;
+    }
+    .mc-arrow:active {
+        transform: scale(0.94);
+    }
+    .mc-arrow:disabled {
+        opacity: 0.2;
+        cursor: default;
+    }
+    .mc-arrow--previous {
+        left: 14px;
+    }
+    .mc-arrow--next {
+        right: 14px;
+    }
+    .mc-keyframe-wrap {
+        position: absolute;
+        z-index: 15;
+        right: 0;
+        bottom: calc(15px + env(safe-area-inset-bottom));
+        left: 0;
+        padding: 0 14px;
+    }
+    .mc-keyframes {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        padding: 4px 2px 5px;
+        scroll-snap-type: x proximity;
+        scrollbar-width: none;
+    }
+    .mc-keyframe {
+        --chapter-accent: #84f7c7;
+        flex: 0 0 72px;
+        min-width: 0;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: rgba(255, 255, 255, 0.66);
+        text-align: left;
+        scroll-snap-align: start;
+        cursor: pointer;
+    }
+    .mc-keyframe-image {
+        position: relative;
+        display: block;
+        width: 72px;
+        overflow: hidden;
+        aspect-ratio: 16 / 9;
+        border: 2px solid rgba(255, 255, 255, 0.25);
+        border-radius: 8px;
+        background: #0a3528;
+        box-shadow: 0 5px 18px rgba(0, 0, 0, 0.28);
+        transition: border-color 160ms ease, transform 160ms ease;
+    }
+    .mc-keyframe-image img {
+        width: 100%;
+        height: 100%;
+        display: block;
+        object-fit: cover;
+    }
+    .mc-keyframe strong {
+        display: block;
+        overflow: hidden;
+        margin-top: 4px;
+        color: inherit;
+        font: 600 6px/1.2 var(--mc-mono);
+        letter-spacing: 0.07em;
+        text-overflow: ellipsis;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+    .mc-keyframe[aria-selected="true"] {
+        color: #fff;
+    }
+    .mc-keyframe[aria-selected="true"] .mc-keyframe-image {
+        border-color: var(--chapter-accent);
+        transform: translateY(-2px);
+    }
+    .mc-swipe-hint {
+        position: absolute;
+        z-index: 16;
+        right: 15px;
+        bottom: calc(4px + env(safe-area-inset-bottom));
+        margin: 0;
+        /* 0.45 landed at 4.48:1 over the #061b16 header — just under AA. 0.6 clears
+       it (~7:1) while staying a quiet hint. */
+        color: rgba(255, 255, 255, 0.6);
+        font: 500 6px/1.2 var(--mc-mono);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+    }
+    .mc-status {
+        position: fixed;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+    }
+    /* No nav-contrast override here on purpose: .site-header carries its own
+     light pill, so the dark logo and burger stay legible over these
+     photographs. Inverting them to white made the logo vanish into the pill. */
+    @media (max-height: 740px) {
+        .mc-copy {
+            bottom: calc(116px + env(safe-area-inset-bottom));
+        }
+        .mc-copy h1,
+        .mc-copy h2 {
+            font-size: clamp(34px, 10vw, 46px);
+        }
+        .mc-copy h1 {
+            font-size: clamp(42px, 13vw, 62px);
+        }
+        .mc-lead {
+            font-size: 14px;
+        }
+        .mc-platforms img {
+            height: 22px;
+        }
+        .mc-detail {
+            margin-top: 8px;
+            font-size: 11px;
+        }
+        .mc-platforms {
+            margin-top: 7px;
+        }
+    }
+    @media (max-width: 340px) {
+        .mc-copy {
+            right: 16px;
+            left: 16px;
+        }
+        .mc-copy h1,
+        .mc-copy h2 {
+            font-size: 34px;
+        }
+        .mc-copy h1 {
+            font-size: 42px;
+        }
+        .mc-platforms {
+            max-width: none;
+        }
+        .mc-keyframe {
+            flex-basis: 64px;
+        }
+        .mc-keyframe-image {
+            width: 64px;
+        }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .mc-track {
+            scroll-behavior: auto;
+        }
+        .mc-keyframe-image,
+        .mc-arrow {
+            transition: none;
+        }
+    }
+}
