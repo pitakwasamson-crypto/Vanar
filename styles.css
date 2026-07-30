@@ -1993,6 +1993,11 @@ summary::-webkit-details-marker {
     }
 }
 
+a {
+    pointer-events: none;
+    cursor: default;
+}
+
 .modal {
     display: none;          /* Hidden by default */
     position: fixed;        /* Stay on top of the page */
